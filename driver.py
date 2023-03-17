@@ -5,16 +5,19 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.options import Options
 
-# chrome_options = Options()
-# chrome_options.add_argument("--headless")
-# chrome_options.add_argument("--window-size=%s" % "1920,1080")
-# chrome_options.binary_location = "chromedriver"
+import os
+
 class Driver:
 
     def __init__(self, url="https://mkpc.malahieude.net/mariokart.php"):
         self.link = url
         self.driver = webdriver.Firefox()
         self.driver.get(url)
+
+        if not os.path.isdir("Images"):
+            # So that we can start capturing the screen
+            os.mkdir("Images")
+
 
     def run(self):
         # Select Grand Prix
