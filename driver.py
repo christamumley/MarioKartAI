@@ -55,8 +55,8 @@ class Driver:
             actions = ActionChains(self.driver).key_down(Keys.UP)
             actions.perform()
 
-            self.driver.save_screenshot(f"Images/captured_{iter}.png")
-            # time.sleep(0.2)
+            self.driver.save_screenshot(f"Images/captured2_{iter}.png")
+            time.sleep(0.5)
 
 
 
