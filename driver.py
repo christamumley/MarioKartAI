@@ -8,6 +8,7 @@ import time
 
 import os
 
+
 class Driver:
 
     def __init__(self, url="https://mkpc.malahieude.net/mariokart.php"):
@@ -19,11 +20,6 @@ class Driver:
             # So that we can start capturing the screen
             os.mkdir("Images")
 
-    """
-        
-        
-    """
-
     def run(self):
         # Select Grand Prix
         elem = self.driver.find_element(By.XPATH, '//input[@value="Grand Prix"]')
@@ -32,13 +28,25 @@ class Driver:
         elem = self.driver.find_element(By.XPATH, '//div[@id="perso-selector-mario"]')
         elem.click()
 
-        #Select cup
+        #Select map
         elem = self.driver.find_element(By.XPATH, '//img[@src="images/cups/champi.gif"]')
         elem.click()
 
-        # Sleep for 3 seconds to try to beat the 3 second countdown / prevent AI from trying to drive while
-        # it cant
-        time.sleep(3)
+        # Sleep as you cannot move for 3 seconds at the start
+        time.sleep(2.8)
+
+        # js.executeScript("document.getElementById('//id of element').setAttribute('attr', '10')");
+
+        # Robert Mode
+        # img_src = "https://cdn.discordapp.com/attachments/1067893021259087905/1088842575768727582/image.png"
+        #
+        # imgE = self.driver.find_element(By.XPATH, '//img[@src="images/sprites/sprite_mario.png"]')
+        # elems = self.driver.find_elements(By.XPATH, '//div[@class="pixelated"]/img')
+        # for imgE in elems:
+        #     self.driver.execute_script("arguments[0].src='" + img_src + "'", imgE);
+
+        # self.driver.execute_script("arguments[0].src='" + img_src + "'", imgE);
+
         # Race now starts - Do something?
         iter = 0
         while True:
@@ -48,8 +56,9 @@ class Driver:
             actions.perform()
 
             self.driver.save_screenshot(f"Images/captured_{iter}.png")
-            time.sleep(0.2)
-        # self.driver.close()
+            # time.sleep(0.2)
+
+
 
 if __name__ == "__main__":
     Driver().run()
