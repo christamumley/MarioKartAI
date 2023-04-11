@@ -121,6 +121,7 @@ class Decider:
         width, height = size
 
         # img = T.functional.crop(img, int(height / 7), int(width / 7), int(height / 1.4), int(width / 1.4))
+        # img = T.functional.crop(img, int(height / 3), int(width / 4), int(height / 2), int(width / 2))
         img = T.functional.crop(img, int(height / 3), int(width / 4), int(height / 2), int(width / 2))
 
         # img = T.functional.crop(img, int(height / 4), int(width / 4), int(height / 2), int(width / 2))
