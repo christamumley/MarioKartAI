@@ -111,7 +111,7 @@ class Decider:
         self.model = MarioSegmentation()
         self.model.load_state_dict(torch.load(self.TRAINED_PATH))
 
-        self.resize_obj = T.Resize((1200,1200), antialias=True)
+        self.resize_obj = T.Resize((128,128), antialias=True)
 
 
     def process_img(self, img_path):
@@ -120,8 +120,14 @@ class Decider:
         size = T.functional.get_image_size(img)
         width, height = size
 
-        img = T.functional.crop(img, int(height / 10), int(width / 5), int(height / 3), int(width / 4))
+        # img = T.functional.crop(img, int(height / 7), int(width / 7), int(height / 1.4), int(width / 1.4))
+        img = T.functional.crop(img, int(height / 3), int(width / 4), int(height / 2), int(width / 2))
 
+        # img = T.functional.crop(img, int(height / 4), int(width / 4), int(height / 2), int(width / 2))
+
+        # img = torchvision.transforms.ToPILImage()(img)
+        # img.show()
+        # exit(0)
         # Resizes to 640,640
         img = self.resize_obj.forward(img)
 
@@ -129,6 +135,13 @@ class Decider:
         img = img.unsqueeze(0)
 
         return img
+
+    def image_map(self, img):
+        preds = self.model(img).squeeze(0)
+
+        preds = preds > .5
+        preds = preds.float()
+        return preds
     def direction_to_move(self, img_path):
         """
         Provided a file path to an image, return the key we should press
@@ -137,15 +150,21 @@ class Decider:
         """
         img = self.process_img(img_path)
 
-        preds = self.model.forward(img).squeeze(0)
+        # preds = self.model.forward(img).squeeze(0)
+        preds = self.model(img).squeeze(0)
+
         preds = preds > .5
         preds = preds.float()
+
+        # img = torchvision.transforms.ToPILImage()(preds)
+        #
+        # img.show()
+        # exit(0)
 
         top_half = torch.hsplit(preds, 2)[0]
 
         thirds = torch.tensor_split(top_half, 3, dim=2)
         # thirds = (thirds[0] * 1.2, thirds[1], thirds[2] * 1.2)
-
         # Divided area into three sections, where each section corresponds to a location we can move to
         directions = {(Keys.LEFT, 'left'): thirds[0], (Keys.UP, 'straight'): thirds[1], (Keys.RIGHT, 'right'): thirds[2]}
 
@@ -164,5 +183,6 @@ class Decider:
 
 
 if __name__ == "__main__":
-    move = Decider().direction_to_move("Images/captured2_6.png")
-    print(f"We should turn {move}")
+    Decider().process_img("Images/s_10.png")
+    # move = Decider().direction_to_move("Images/captured2_6.png")
+    # print(f"We should turn {move}")

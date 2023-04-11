@@ -10,6 +10,7 @@ import time
 import os
 
 from SegmentationAI import Decider
+from ImitationDriver import ImitationDriver
 
 class Driver:
 
@@ -19,6 +20,8 @@ class Driver:
         self.driver.get(url)
 
         self.decider = Decider()
+
+        self.imitationDecider = ImitationDriver()
 
         if not os.path.isdir("Images"):
             # So that we can start capturing the screen
@@ -39,8 +42,6 @@ class Driver:
         # Sleep as you cannot move for 3 seconds at the start
         time.sleep(2.8)
 
-
-        # Race now starts - Do something?
         iter = 0
         while True:
             iter += 1
@@ -48,39 +49,64 @@ class Driver:
             if debug_mode:
                 self.capture_screen(iter)
             else:
-                self.decide_movement()
+                self.decide_movement_segmentation()
+                # self.decide_movement_imitation()
 
-    def decide_movement(self, img_path="Images/current_state.png"):
+
+    def decide_movement_imitation(self, img_path="Images/current_state.png"):
         ActionChains(self.driver).key_down("P").perform()
-        self.driver.save_screenshot(img_path)
-        action, move = self.decider.direction_to_move(img_path)
+
+        elem = self.driver.find_element(By.XPATH, '//div[@class="game-container"]')
+        elem.screenshot(img_path)
+
+        action, move = self.imitationDecider.make_prediction(img_path)
+        ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.LEFT).perform()
+        print(f"Should take {action} - {move}")
+
         ActionChains(self.driver).key_up("P").perform()
-        print(f"We should turn {move}")
+
+        if move != "up":
+            ActionChains(self.driver).key_down(action).key_down(Keys.UP).perform()
+        else:
+            ActionChains(self.driver).key_down(action).perform()
+
+    def decide_movement_segmentation(self, img_path="Images/current_state.png"):
+        ActionChains(self.driver).key_down("P").perform()
+
+        # Can save ~.03 seconds using this
+        # img = self.driver.get_screenshot_as_png()
+        # s = time.time()
+        elem = self.driver.find_element(By.XPATH, '//div[@class="game-container"]')
+        elem.screenshot(img_path)
+        # self.driver.save_screenshot(img_path)
+        action, move = self.decider.direction_to_move(img_path)
+        # print(f"Takes {time.time() - s} to make a decision")
+        ActionChains(self.driver).key_up("P").perform()
+        # print(f"We should turn {move}")
         ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.LEFT).perform()
         if move != 'straight':
             # ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.LEFT).perform()
             ActionChains(self.driver).key_down(action).key_down(Keys.UP).perform()
-            time.sleep(0.1)
-            ActionChains(self.driver).key_up(action).perform()
-            time.sleep(0.05)
+            # time.sleep(0.025)
+            # ActionChains(self.driver).key_up(action).perform()
+            # time.sleep(0.05)
             # ActionChains(self.driver).key_down(Keys.UP).perform()
         else:
             ActionChains(self.driver).key_down(action).perform()
-            time.sleep(0.1)
+            # time.sleep(0.1)
         # time.sleep(0.1)
         # ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.LEFT).perform()
-
-        # ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()
-        # ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.RIGHT).perform()
-
-        # time.sleep(0.01)
-        # ActionChains(self.driver).key_down(Keys.UP).perform()
-        # # time.sleep(0.)
+        # time.sleep(0.001)
 
     def capture_screen(self, iter):
-        actions = ActionChains(self.driver).key_down(Keys.UP)
-        actions.perform()
-        self.driver.save_screenshot(f"Images/captured2_{iter}.png")
+        s = time.time()
+        elem = self.driver.find_element(By.XPATH, '//div[@class="game-container"]')
+
+        # actions = ActionChains(self.driver).key_down(Keys.UP)
+        # actions.perform()
+        # elem.save_screenshot(f"Images/captured2_{iter}.png")
+        elem.screenshot(f"Images/s_{iter}.png")
+        print("Took : ", time.time() - s)
         time.sleep(0.5)
     def capture_keyboard_acts(self, iter):
         """
@@ -103,7 +129,9 @@ class Driver:
 
         img_path += ".png"
 
+
         self.driver.save_screenshot(img_path)
+
         # actions = ActionChains(self.driver).key_down(Keys.UP)
         # actions.perform()
         # self.driver.save_screenshot(f"Images/captured2_{iter}.png")

@@ -18,8 +18,8 @@ class Processor:
         img = T.functional.crop(img, int(height/10), int(width/10), int(height/3), int(width/2.1))
 
         # img = torchvision.transforms.ToPILImage()(img)
-        #
         # img.show()
+        # exit(0)
         write_png(img, path)
 
     @classmethod
