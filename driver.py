@@ -76,13 +76,22 @@ class Driver:
 
         elem = self.driver.find_element(By.XPATH, '//div[@class="game-container"]')
         elem.screenshot(img_path)
-        action, move = self.decider.direction_to_move(img_path)
+        actionPair, angle = self.decider.direction_to_move(img_path)
+        action, move = actionPair
+
+        print(f"Should move: {move} {angle}")
         ActionChains(self.driver).key_up("P").perform()
 
         ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.LEFT).perform()
         if move != 'straight':
             # ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.LEFT).perform()
             ActionChains(self.driver).key_down(action).key_down(Keys.UP).perform()
+            # time.sleep(0.1 * angle)
+            # if angle > 0.6:
+            #     ActionChains(self.driver).key_down(action).key_down(Keys.UP).perform()
+            # else:
+            #     ActionChains(self.driver).key_down(action).perform()
+
             # if np.random.random() > 0.3:
             #     ActionChains(self.driver).key_down(action).key_down(Keys.UP).perform()
             # else:
@@ -104,7 +113,7 @@ class Driver:
 
     def capture_screen(self, iter):
         s = time.time()
-        elem = self.driver.find_element(By.XPATH, '//div[@class="game-container"]')
+        elem = self.driver.find_element(By.XPATH, '//div[@class="game-container"]/canvas')
 
         # actions = ActionChains(self.driver).key_down(Keys.UP)
         # actions.perform()
@@ -144,7 +153,7 @@ class Driver:
 
 
 if __name__ == "__main__":
-    Driver().run(debug_mode=False)
+    Driver().run(debug_mode=True)
 
 
 """

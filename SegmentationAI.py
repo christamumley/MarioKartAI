@@ -8,6 +8,8 @@ import numpy as np
 from torch.utils.data import Dataset, DataLoader
 import os
 import time
+import torchvision.transforms.functional as F
+import cv2
 from torchmetrics.classification.accuracy import BinaryAccuracy
 
 import os
@@ -137,6 +139,19 @@ class Decider:
 
         return img
 
+    def new_process_img(self, path):
+        img = read_image(f"{path}", ImageReadMode.RGB)
+        img = img.float()
+
+        size = T.functional.get_image_size(img)
+        width, height = size
+
+        img = T.functional.crop(img, int(height / 3), int(width / 4), int(height / 2), int(width / 2))
+        img = self.resize_obj.forward(img)
+
+        img = img.unsqueeze(0)
+        return img
+
     def image_map(self, img):
         preds = self.model(img).squeeze(0)
 
@@ -149,7 +164,7 @@ class Decider:
         :param img_path: The image path we are processing
         :return: The key we should be pressing
         """
-        img = self.process_img(img_path)
+        img = self.new_process_img(img_path)
 
         # preds = self.model.forward(img).squeeze(0)
         preds = self.model(img).squeeze(0)
@@ -162,10 +177,10 @@ class Decider:
         # img.show()
         # exit(0)
 
-        top_half = torch.hsplit(preds, 2)[0]
+        # top_half = torch.hsplit(preds, 2)[0]
 
-        thirds = torch.tensor_split(top_half, 3, dim=2)
-        # thirds = (thirds[0] * 1.2, thirds[1], thirds[2] * 1.2)
+        thirds = torch.tensor_split(preds, 3, dim=2)
+
         # Divided area into three sections, where each section corresponds to a location we can move to
         directions = {(Keys.LEFT, 'left'): thirds[0], (Keys.UP, 'straight'): thirds[1], (Keys.RIGHT, 'right'): thirds[2]}
 
@@ -180,8 +195,23 @@ class Decider:
             if optimal_direct is None or optimal_score < key_score:
                 optimal_direct = key
                 optimal_score = key_score
-        return optimal_direct
 
+        angle = None
+        if optimal_direct[1] != "straight":
+            deg = self.calculate_direction(preds)
+            angle = deg
+
+
+        return optimal_direct, angle
+
+    @classmethod
+    def calculate_direction(cls, img):
+        test = F.to_pil_image(img)
+        test = np.array(test)
+        test = cv2.ximgproc.thinning(test)
+        points = cv2.findNonZero(test)
+        direction, _, _, _ = cv2.fitLine(points, cv2.DIST_L1, 0, 0.01, 0.01)
+        return direction
 
 if __name__ == "__main__":
     Decider().process_img("Images/s_10.png")
