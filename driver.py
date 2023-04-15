@@ -61,7 +61,7 @@ class Driver:
         elem.screenshot(img_path)
 
         action, move = self.imitationDecider.make_prediction(img_path)
-        ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.LEFT).perform()
+        ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()
         print(f"Should take {action} - {move}")
 
         ActionChains(self.driver).key_up("P").perform()
@@ -70,6 +70,8 @@ class Driver:
             ActionChains(self.driver).key_down(action).key_down(Keys.UP).perform()
         else:
             ActionChains(self.driver).key_down(action).perform()
+
+
 
     def decide_movement_segmentation(self, img_path="Images/current_state.png"):
         ActionChains(self.driver).key_down("P").perform()
@@ -82,33 +84,20 @@ class Driver:
         print(f"Should move: {move} {angle}")
         ActionChains(self.driver).key_up("P").perform()
 
-        ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.LEFT).perform()
+        ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()
+
         if move != 'straight':
             # ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.LEFT).perform()
             ActionChains(self.driver).key_down(action).key_down(Keys.UP).perform()
-            # time.sleep(0.1 * angle)
-            # if angle > 0.6:
-            #     ActionChains(self.driver).key_down(action).key_down(Keys.UP).perform()
-            # else:
-            #     ActionChains(self.driver).key_down(action).perform()
 
-            # if np.random.random() > 0.3:
-            #     ActionChains(self.driver).key_down(action).key_down(Keys.UP).perform()
-            # else:
-            #     ActionChains(self.driver).key_down(action).perform()
-
-            # time.sleep(0.025)
-            # ActionChains(self.driver).key_up(action).perform()
-            # time.sleep(0.05)
-            # ActionChains(self.driver).key_down(Keys.UP).perform()
         else:
             ActionChains(self.driver).key_down(action).perform()
-        time.sleep(0.05 * np.random.random())
-        # time.sleep(0.1)
-        # ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.LEFT).perform()
-        ActionChains(self.driver).key_up(Keys.UP).perform()
-        time.sleep(0.05)
-        ActionChains(self.driver).key_down(Keys.UP).perform()
+        # time.sleep(0.05 * np.random.random())
+        #time.sleep(0.1 * np.random.random())
+        #ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()
+        # ActionChains(self.driver).key_up(Keys.UP).perform()
+        # time.sleep(0.05)
+        # ActionChains(self.driver).key_down(Keys.UP).perform()
 
 
     def capture_screen(self, iter):

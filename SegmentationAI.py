@@ -9,6 +9,7 @@ from torch.utils.data import Dataset, DataLoader
 import os
 import time
 import torchvision.transforms.functional as F
+import torchvision.transforms as TT
 import cv2
 from torchmetrics.classification.accuracy import BinaryAccuracy
 
@@ -134,14 +135,16 @@ class Decider:
         # Resizes to 640,640
         img = self.resize_obj.forward(img)
 
-        img = img.float()
+        # img = img.float()
+        img = TT.ConvertImageDtype(torch.float32).forward(img)
         img = img.unsqueeze(0)
 
         return img
 
     def new_process_img(self, path):
         img = read_image(f"{path}", ImageReadMode.RGB)
-        img = img.float()
+        # img = img.float()
+        img = TT.ConvertImageDtype(torch.float32).forward(img)
 
         size = T.functional.get_image_size(img)
         width, height = size
