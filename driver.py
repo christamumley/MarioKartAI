@@ -93,10 +93,10 @@ class Driver:
         else:
             ActionChains(self.driver).key_down(action).perform()
         # time.sleep(0.05 * np.random.random())
-        #time.sleep(0.1 * np.random.random())
-        #ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()
-        # ActionChains(self.driver).key_up(Keys.UP).perform()
-        # time.sleep(0.05)
+        time.sleep(0.1 * np.random.random())
+        ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()
+        #ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()ains(self.driver).key_up(Keys.UP).perform()
+        time.sleep(0.05)
         # ActionChains(self.driver).key_down(Keys.UP).perform()
 
 
@@ -142,7 +142,7 @@ class Driver:
 
 
 if __name__ == "__main__":
-    Driver().run(debug_mode=True)
+    Driver().run(debug_mode=False)
 
 
 """
