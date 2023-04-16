@@ -180,9 +180,9 @@ class Decider:
         # img.show()
         # exit(0)
 
-        # top_half = torch.hsplit(preds, 2)[0]
+        top_half = torch.hsplit(preds, 2)[0]
 
-        thirds = torch.tensor_split(preds, 3, dim=2)
+        thirds = torch.tensor_split(top_half, 3, dim=2)
 
         # Divided area into three sections, where each section corresponds to a location we can move to
         directions = {(Keys.LEFT, 'left'): thirds[0], (Keys.UP, 'straight'): thirds[1], (Keys.RIGHT, 'right'): thirds[2]}

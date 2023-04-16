@@ -74,7 +74,7 @@ class Driver:
 
 
     def decide_movement_segmentation(self, img_path="Images/current_state.png"):
-        ActionChains(self.driver).key_down("P").perform()
+        # ActionChains(self.driver).key_down("P").perform()
 
         elem = self.driver.find_element(By.XPATH, '//div[@class="game-container"]')
         elem.screenshot(img_path)
@@ -82,21 +82,24 @@ class Driver:
         action, move = actionPair
 
         print(f"Should move: {move} {angle}")
-        ActionChains(self.driver).key_up("P").perform()
+        # ActionChains(self.driver).key_up("P").perform()
 
         ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()
 
         if move != 'straight':
             # ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.LEFT).perform()
-            ActionChains(self.driver).key_down(action).key_down(Keys.UP).perform()
+            if np.random.rand() < 0.3:
+                ActionChains(self.driver).key_down(action).key_down(Keys.UP).perform()
+            else:
+                ActionChains(self.driver).key_down(action).perform()
 
         else:
             ActionChains(self.driver).key_down(action).perform()
         # time.sleep(0.05 * np.random.random())
-        time.sleep(0.1 * np.random.random())
-        ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()
+        # time.sleep(0.5 * np.random.random())
+        # ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()
         #ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()ains(self.driver).key_up(Keys.UP).perform()
-        time.sleep(0.05)
+        # time.sleep(0.05)
         # ActionChains(self.driver).key_down(Keys.UP).perform()
 
 
