@@ -16,7 +16,9 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self): 
         self.send_response(200)
-        self.wfile.write(b'ty')
+        self.send_header('Content-Type', 'text/plain')
+        self.end_headers()
+        self.wfile.write(b'Thanks')
 
 
 # Create a TCP socket and bind it to the localhost and port number
