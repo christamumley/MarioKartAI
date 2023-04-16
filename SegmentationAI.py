@@ -150,7 +150,13 @@ class Decider:
         width, height = size
 
         img = T.functional.crop(img, int(height / 3), int(width / 4), int(height / 2), int(width / 2))
+
+        # img = torchvision.transforms.ToPILImage()(img)
+        # img.show()
+        # exit(0)
+
         img = self.resize_obj.forward(img)
+
 
         img = img.unsqueeze(0)
         return img
@@ -217,6 +223,7 @@ class Decider:
         return direction
 
 if __name__ == "__main__":
-    Decider().process_img("Images/s_10.png")
+    img = Decider().new_process_img("Images/s_10.png")
+
     # move = Decider().direction_to_move("Images/captured2_6.png")
     # print(f"We should turn {move}")
