@@ -14,19 +14,25 @@ while true do
     -- Pack the image into a request 
     local buff = "./buff.png"
     client.screenshot(buff)
-    local file = io.open(buff, "rb")
-    local data = file:read("*all")
-    file:close()
     -- Delete Screenshot
-    --os.remove(buff)
+    -- os.remove(buff)
 
+    local response = webclient:UploadData(url, "POST", Encoding.ASCII:GetBytes("process"))
 
-    webclient.Headers:Add("Content-Type", "image/png")
-    local response = webclient:UploadData(url, "POST", data)
-
-    local FRAMES_TO_SKIP = 24
+    local FRAMES_TO_SKIP = 1
     -- Decode the response data and print it to the console
     local responseString = Encoding.ASCII:GetString(response)
+
+    --randomness 
+    local velocity = false;
+    if (responseString ~= 'straight') then 
+        local prob = math.random(1, 10) / 10
+        print(prob)
+        if (prob > 0.5) then
+             velocity = true
+        end
+    end
+
     if ( responseString == 'straight' ) then 
         for i = 0, FRAMES_TO_SKIP, 1
         do
@@ -36,21 +42,23 @@ while true do
     elseif ( responseString == 'left' ) then 
         for i = 0, FRAMES_TO_SKIP, 1
         do
-            joypad.set({Left=true, B=true}, 1)
+            if (velocity) then
+                joypad.set({Left=true, B=true}, 1)
+            else 
+                joypad.set({Left=true, B=false}, 1)
+            end
             emu.frameadvance()
         end
     elseif ( responseString == 'right' ) then 
         for i = 0, FRAMES_TO_SKIP, 1
         do
-            joypad.set({Right=true, B=true}, 1)
+            if (velocity) then
+                joypad.set({Right=true, B=true}, 1)
+            else 
+                joypad.set({Right=true, B=false}, 1)
+            end
             emu.frameadvance()
         end
     end 
     print(responseString)
-
-    -- local FRAMES_TO_SKIP = 24
-    -- for i = 0, FRAMES_TO_SKIP, 1
-    -- do
-    --     emu.frameadvance()
-    -- end
 end
