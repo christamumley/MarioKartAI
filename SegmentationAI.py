@@ -211,7 +211,7 @@ class Decider:
             angle = deg
 
 
-        return optimal_direct, angle
+        return optimal_direct, optimal_score / totalSum
 
     @classmethod
     def calculate_direction(cls, img):

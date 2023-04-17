@@ -4,8 +4,12 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.options import Options
-import keyboard
+# import keyboard
 import time
+import threading
+
+from pynput import keyboard
+
 
 import os
 import numpy as np
@@ -13,10 +17,50 @@ import numpy as np
 from SegmentationAI import Decider
 from ImitationDriver import ImitationDriver
 
+
+class keylistener:
+    def __init__(self):
+        self.left = False
+        self.right = False
+        self.up = False
+    def on_press(self, key):
+        if key == keyboard.Key.up:
+            self.up = True
+        elif key == keyboard.Key.left:
+            self.left = True
+        elif key == keyboard.Key.right:
+            self.right = True
+
+    def keys_pressed(self):
+        img_path = ""
+        if self.up:
+            img_path += "up_"
+        if self.left:
+            img_path += "left_"
+        if self.right:
+            img_path += "right_"
+        print(img_path)
+        return img_path
+    def on_release(self, key):
+        if key == keyboard.Key.up:
+            self.up = False
+        elif key == keyboard.Key.left:
+            self.left = False
+        elif key == keyboard.Key.right:
+            self.right = False
+
+    def listen(self):
+        with keyboard.Listener(on_press=self.on_press, on_release=self.on_release) as listener:
+            listener.join()
+
+
+
+
 class Driver:
 
     def __init__(self, url="https://mkpc.malahieude.net/mariokart.php"):
         self.link = url
+
         self.driver = webdriver.Firefox()
         self.driver.get(url)
 
@@ -29,8 +73,14 @@ class Driver:
             os.mkdir("Images")
 
     def run(self, debug_mode=False):
+        keyClient = keylistener()
+
+
+        threading.Thread(target=keyClient.listen).start()
+
+
         # Select Grand Prix
-        elem = self.driver.find_element(By.XPATH, '//input[@value="Grand Prix"]')
+        elem = self.driver.find_element(By.XPATH, '//input[@value="Time trial"]')
         elem.click()
         # Select player (mario)
         elem = self.driver.find_element(By.XPATH, '//div[@id="perso-selector-mario"]')
@@ -39,6 +89,13 @@ class Driver:
         #Select map
         elem = self.driver.find_element(By.XPATH, '//img[@src="images/cups/champi.gif"]')
         elem.click()
+        # elem = self.driver.find_element(By.XPATH, '//img[@src="images/cups/champi.gif"]')
+        elem = self.driver.find_element(By.XPATH, '//img[@src="images/selectors/select_map1.png"]')
+        elem.click()
+        time.sleep(1)
+        elem = self.driver.find_element(By.XPATH, '//input[@value="Play alone"]')
+        elem.click()
+
 
         # Sleep as you cannot move for 3 seconds at the start
         time.sleep(2.8)
@@ -50,12 +107,13 @@ class Driver:
             if debug_mode:
                 self.capture_screen(iter)
             else:
-                self.decide_movement_segmentation()
-                # self.decide_movement_imitation()
+                # self.capture_keyboard_acts(iter, keyClient)
+                # self.decide_movement_segmentation()
+                self.decide_movement_imitation()
 
 
     def decide_movement_imitation(self, img_path="Images/current_state.png"):
-        ActionChains(self.driver).key_down("P").perform()
+        # ActionChains(self.driver).key_down("P").perform()
 
         elem = self.driver.find_element(By.XPATH, '//div[@class="game-container"]')
         elem.screenshot(img_path)
@@ -64,13 +122,16 @@ class Driver:
         ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()
         print(f"Should take {action} - {move}")
 
-        ActionChains(self.driver).key_up("P").perform()
-
-        if move != "up":
-            ActionChains(self.driver).key_down(action).key_down(Keys.UP).perform()
-        else:
-            ActionChains(self.driver).key_down(action).perform()
-
+        if move == "up":
+            ActionChains(self.driver).key_down(Keys.UP).perform()
+        elif move == "up left":
+            ActionChains(self.driver).key_down(Keys.LEFT).key_down(Keys.UP).perform()
+        elif move == "right":
+            ActionChains(self.driver).key_down(Keys.RIGHT).perform()
+        elif move == "up right":
+            ActionChains(self.driver).key_down(Keys.RIGHT).key_down(Keys.UP).perform()
+        elif move == "left":
+            ActionChains(self.driver).key_down(Keys.LEFT).perform()
 
 
     def decide_movement_segmentation(self, img_path="Images/current_state.png"):
@@ -85,6 +146,7 @@ class Driver:
         # ActionChains(self.driver).key_up("P").perform()
 
         ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()
+
 
         if move != 'straight':
             # ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.LEFT).perform()
@@ -113,38 +175,20 @@ class Driver:
         elem.screenshot(f"Images/s_{iter}.png")
         print("Took : ", time.time() - s)
         time.sleep(0.5)
-    def capture_keyboard_acts(self, iter):
+    def capture_keyboard_acts(self, iter, keyClient:keylistener):
         """
         Used to capture training images - just drives straight
         :return:
         """
-        up = keyboard.is_pressed('up')
-        left = keyboard.is_pressed('left')
-        right = keyboard.is_pressed('right')
 
-        print(f"up: {up} left: {left} right: {right}")
-
-        img_path = f"ReinforcementImages/reinforce3-{iter}_"
-        if up:
-            img_path += "up_"
-        if left:
-            img_path += "left_"
-        if right:
-            img_path += "right_"
-
+        img_path = f"ReinforcementImages/reinforce6-{iter}_"
+        img_path += keyClient.keys_pressed()
         img_path += ".png"
-
-
         self.driver.save_screenshot(img_path)
 
-        # actions = ActionChains(self.driver).key_down(Keys.UP)
-        # actions.perform()
-        # self.driver.save_screenshot(f"Images/captured2_{iter}.png")
-        # time.sleep(0.5)
-
-
-
 if __name__ == "__main__":
+
+    # keylistener().listen()
     Driver().run(debug_mode=False)
 
 

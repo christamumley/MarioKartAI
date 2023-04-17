@@ -25,8 +25,12 @@ class Processor:
     @classmethod
     def rescale(cls, dir = "ReinforcementImages/"):
         for file in os.listdir(dir):
-            print(file)
-            cls.process_image(f"{dir}{file}")
+            try:
+                print(file)
+                cls.process_image(f"{dir}{file}")
+            except:
+                print("\tfailed")
+
 
 
 
@@ -34,6 +38,6 @@ if __name__ == "__main__":
     start = time.time()
     # Processor.process_image("Images/captured_1.png")
     # Processor.process_image("ReinforcementImages/reinforce2-15_up_left_.png")
-    Processor.rescale(dir="Images/")
+    Processor.rescale(dir="ReinforcementImages/")
     # Processor.process_json_data("example_input.json")
     print(f"Took {time.time() - start} seconds to process image")
