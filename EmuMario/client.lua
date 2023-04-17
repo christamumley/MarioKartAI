@@ -8,7 +8,6 @@ local url = "http://localhost:8080" -- URL of the server to connect to
 local webclient = WebClient()
 local response = webclient:DownloadString(url)
 
-local data = "name=John&age=30" -- The data to send in the request body
 local headers = {} -- Optional headers to include in the request
 
 for key, value in pairs(headers) do
@@ -18,12 +17,28 @@ end
 -- Print the response message
 print(response)
 
-client.screenshot("screenshot.png")
+-- Pack the image into a request 
+local buff = "./buff.png"
+client.screenshot(buff)
+local file = io.open(buff, "rb")
+local data = file:read("*all")
+file:close()
+-- Delete Screenshot
+os.remove(buff)
 
 -- Convert the data to a byte array and send the POST request
-local bytes = Encoding.ASCII:GetBytes(data)
-local response = webclient:UploadData(url, "POST", bytes)
+-- local bytes = Encoding.ASCII:GetBytes(file)
+webclient.Headers:Add("Content-Type", "image/png")
+local response = webclient:UploadData(url, "POST", data)
 
 -- Decode the response data and print it to the console
 local responseString = Encoding.ASCII:GetString(response)
+if ( responseString == 'Right' )
+then 
+    gui.text(50, 50, 'Right Pressed.')
+    while true do
+        joypad.set({Right=true, B=true}, 1)
+        emu.frameadvance()
+    end
+end 
 print(responseString)
