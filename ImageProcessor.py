@@ -29,7 +29,6 @@ class Processor:
             cls.process_image(f"{dir}{file}")
 
 
-
 if __name__ == "__main__":
     start = time.time()
     # Processor.process_image("Images/captured_1.png")
