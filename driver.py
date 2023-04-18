@@ -108,8 +108,8 @@ class Driver:
                 self.capture_screen(iter)
             else:
                 # self.capture_keyboard_acts(iter, keyClient)
-                # self.decide_movement_segmentation()
-                self.decide_movement_imitation()
+                self.decide_movement_segmentation()
+                #self.decide_movement_imitation()
 
 
     def decide_movement_imitation(self, img_path="Images/current_state.png"):
@@ -117,11 +117,9 @@ class Driver:
 
         elem = self.driver.find_element(By.XPATH, '//div[@class="game-container"]')
         elem.screenshot(img_path)
-
         action, move = self.imitationDecider.make_prediction(img_path)
         ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()
-        print(f"Should take {action} - {move}")
-
+        print(f"Should take {action} - {move} ")
         if move == "up":
             ActionChains(self.driver).key_down(Keys.UP).perform()
         elif move == "up left":
@@ -132,7 +130,6 @@ class Driver:
             ActionChains(self.driver).key_down(Keys.RIGHT).key_down(Keys.UP).perform()
         elif move == "left":
             ActionChains(self.driver).key_down(Keys.LEFT).perform()
-
 
     def decide_movement_segmentation(self, img_path="Images/current_state.png"):
         # ActionChains(self.driver).key_down("P").perform()
@@ -181,7 +178,7 @@ class Driver:
         :return:
         """
 
-        img_path = f"ReinforcementImages/reinforce6-{iter}_"
+        img_path = f"ReinforcementImages/reinforce7-{iter}_"
         img_path += keyClient.keys_pressed()
         img_path += ".png"
         self.driver.save_screenshot(img_path)

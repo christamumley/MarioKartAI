@@ -17,7 +17,9 @@ class ImitationNN(pl.LightningModule):
         self.layers = nn.Sequential(
             nn.Linear(in_features=128 * 128, out_features=64 * 64),
             nn.Linear(in_features=64 * 64, out_features=32 * 32),
-            nn.Linear(in_features=32 * 32, out_features=6)
+            nn.Linear(in_features=32 * 32, out_features=6),
+            nn.Softmax(),
+
         )
 
         self.loss = nn.CrossEntropyLoss()
@@ -74,10 +76,12 @@ class ImitationDriver:
 
         preds = self.model(img)
 
-        pred_idx = self.highest_idx(preds)
+        pred_idx, m = self.highest_idx(preds)
 
         # ALWAYS MAKE SURE THESE ARE THE SAME THAN THOSE GENERATED IN THE NOTEBOOK!!!!!
         # maps = {0: 'up', 1: 'up left', 2: 'up right', 3: ''}
+        #{0: 'up', 1: 'up left', 2: 'right', 3: 'up right', 4: 'left', 5: ''}
+
         maps = {0: (Keys.UP, 'up'),
                 1: (Keys.LEFT, 'up left'),
                 2: (Keys.RIGHT, 'right'),
@@ -85,7 +89,6 @@ class ImitationDriver:
                 4: (Keys.LEFT, 'left'),
                 5: (Keys.SPACE,'')
                 }
-        #{0: 'up', 1: 'up left', 2: 'right', 3: 'up right', 4: 'left', 5: ''}
 
         direct = maps[pred_idx]
 
@@ -100,7 +103,7 @@ class ImitationDriver:
             if m is None or val > m:
                 m = val
                 out_idx = idx
-        return out_idx
+        return out_idx, m
 
 
 if __name__ == "__main__":
