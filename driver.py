@@ -154,21 +154,11 @@ class Driver:
 
         else:
             ActionChains(self.driver).key_down(action).perform()
-        # time.sleep(0.05 * np.random.random())
-        # time.sleep(0.5 * np.random.random())
-        # ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()
-        #ActionChains(self.driver).key_up(Keys.LEFT).key_up(Keys.UP).key_up(Keys.RIGHT).perform()ains(self.driver).key_up(Keys.UP).perform()
-        # time.sleep(0.05)
-        # ActionChains(self.driver).key_down(Keys.UP).perform()
-
 
     def capture_screen(self, iter):
         s = time.time()
         elem = self.driver.find_element(By.XPATH, '//div[@class="game-container"]/canvas')
 
-        # actions = ActionChains(self.driver).key_down(Keys.UP)
-        # actions.perform()
-        # elem.save_screenshot(f"Images/captured2_{iter}.png")
         elem.screenshot(f"Images/s_{iter}.png")
         print("Took : ", time.time() - s)
         time.sleep(0.5)
@@ -188,17 +178,3 @@ if __name__ == "__main__":
     # keylistener().listen()
     Driver().run(debug_mode=False)
 
-
-"""
-    Robert Mode: 
-       # Robert Mode 
-        # img_src = "https://cdn.discordapp.com/attachments/1067893021259087905/1088842575768727582/image.png"
-        #
-        # imgE = self.driver.find_element(By.XPATH, '//img[@src="images/sprites/sprite_mario.png"]')
-        # elems = self.driver.find_elements(By.XPATH, '//div[@class="pixelated"]/img')
-        # for imgE in elems:
-        #     self.driver.execute_script("arguments[0].src='" + img_src + "'", imgE);
-
-        # self.driver.execute_script("arguments[0].src='" + img_src + "'", imgE);
-
-"""
