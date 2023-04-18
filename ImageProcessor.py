@@ -32,8 +32,6 @@ class Processor:
                 print("\tfailed")
 
 
-
-
 if __name__ == "__main__":
     start = time.time()
     # Processor.process_image("Images/captured_1.png")
